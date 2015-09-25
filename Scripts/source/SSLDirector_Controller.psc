@@ -2,7 +2,7 @@
 {SexLab Director Main Control}
 import Utility
 
-; SexLab Status
+; SexLab
 SexLabFramework Property SexLab auto
 int Property SSLversion auto
 Quest SexLabQuestFramework ; SexLab MainQuest(SexLab config)
@@ -43,15 +43,14 @@ string Property SaveTimeString2 = "No Data" auto
 
 ;/===============================================/;
 
-Event OnInit()
-EndEvent
-
-Event OnUpdate()
-EndEvent
+Function InitialSetup()
+	Player = Game.GetPlayer()
+	AnimationMenu = myQuest as SSLDirector_AnimationMenu
+	DirectorHUD_Status = DirectorHUD.GetHudversionVer()
+EndFunction
 
 Function Setup()
 	log("SSLDirector_Controller Setup...")
-	Player = Game.GetPlayer()
 	ClearSet()
 	RegisterEventSet()
 	If CheckSexLab()
@@ -60,8 +59,6 @@ Function Setup()
 		RegisterMenuKey()
 		RegisterSexLabCommonEvent()
 	endif
-	AnimationMenu = myQuest as SSLDirector_AnimationMenu
-	DirectorHUD_Status = DirectorHUD.GetHudversionVer()
 EndFunction
 
 Function ClearSet()
@@ -88,7 +85,7 @@ EndEvent
 
 
 ;/===========================================
-	SexLab Utility
+	SexLab Section
 ============================================/;
 Event OnAnimationStart(string eventName, string argString, float argNum, form sender)
 	sslThreadController controller = SexLab.HookController(argString)
@@ -99,19 +96,35 @@ Event OnAnimationStart(string eventName, string argString, float argNum, form se
 		isPlayerThreadAggressive = controller.IsAggressive
 		PlayerThreadPositions = controller.Positions
 		log("Player SexScene Start - ID : " + PlayerThreadID + " - [Aggressive = " + isPlayerThreadAggressive + "]")
+	else
+		log("OnAnimationStart - Thread ID : " + argString + " - not with Player !")
 	endIf
 
 EndEvent
 Event OnStageStart(string eventName, string argString, float argNum, form sender)
-	PlayerThreadAnimation = SexLab.HookAnimation(argString)
-	currentStage = SexLab.HookStage(argString)
-	maxStage = PlayerThreadAnimation.StageCount
-	PlayerThreadAnimationName = PlayerThreadAnimation.name
-	log("Player SexScene ID : " + PlayerThreadID + " - [" + PlayerThreadAnimation.name + "] " + currentStage + " / " + maxStage)
+	sslThreadController controller = SexLab.HookController(argString)
+	If controller.HasPlayer
+		PlayerThreadAnimation = SexLab.HookAnimation(argString)
+		currentStage = SexLab.HookStage(argString)
+		maxStage = PlayerThreadAnimation.StageCount
+		PlayerThreadAnimationName = PlayerThreadAnimation.name
+		log("Player SexScene ID : " + PlayerThreadID + " - [" + PlayerThreadAnimation.name + "] " + currentStage + " / " + maxStage)
+	else
+		log("OnStageStart - Thread ID : " + argString + " - not with Player !")
+	endif
 EndEvent
+
+Event OnOrgasmStart(string eventName, string argString, float argNum, form sender)
+EndEvent
+
 Event OnAnimationEnd(string eventName, string argString, float argNum, form sender)
-	log("Player SexScene Start - ID : " + PlayerThreadID + " , End")
-	CleanPlayerThreadInfo()
+	sslThreadController controller = SexLab.HookController(argString)
+	If controller.HasPlayer
+		log("Player SexScene Start - ID : " + PlayerThreadID + " , Animation End")
+		CleanPlayerThreadInfo()
+	else
+		log("OnAnimationEnd - Thread ID : " + argString + " - not with Player !")
+	endif
 EndEvent
 
 Function CleanPlayerThreadInfo()
@@ -131,7 +144,7 @@ bool Function CheckSexLab()
 		SKSE_Status = "installed [OK]"
 	else
 		SKSE_OK = false
-		SKSE_Status = "not installed [NG]"
+		SKSE_Status = "out of version [NG]"
 	endif
 	if !(SexLabUtil.SexLabIsActive())
 		SexLab_Status = "$SexLab_not_active"
@@ -238,7 +251,7 @@ Function RegisterSexLabCommonEvent()
 	RegisterForModEvent("AnimationEnd", "OnAnimationEnd")
 	RegisterForModEvent("StageStart", "OnStageStart")
 	RegisterForModEvent("AnimationChange", "OnStageStart")
-	RegisterForModEvent("OrgasmStart", "OnStageStart")
+	RegisterForModEvent("OrgasmStart", "OnOrgasmStart")
 EndFunction
 Function UnregisterSexLabCommonEvent()
 	UnregisterForModEvent("AnimationStart")
@@ -287,7 +300,7 @@ string Function GetTranslateMsg(string a_msg)
 	While !translateMsg
 		Wait(0.2)
 		i += 1
-		if (i >= 10)
+		if (i >= 5)
 			translateMsg = "Error"
 			log("GetTranslateMsg - DirectHUD cannot access" , true)
 		endif

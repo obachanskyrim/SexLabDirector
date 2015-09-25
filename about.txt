@@ -1,0 +1,26 @@
+======================================
+SexLab Director
+by obachan
+ver. 1.0
+======================================
+
+Credits and special thanks -----------
+
+Bethesda Softworks
+SKSE team
+SkyUI team - creating Unofficial UI SDK
+SkyUILib Team
+Skyrim Sexlab Framework
+
+Contact Me ---------------------------
+
+Blog: http://skyrim-sweetslab.blogspot.jp/
+Email: obachanskyrim@gmail.com
+
+Changelog ----------------------------
+
+v1.01 released 2015.9.25
+	- Added "More Nasty Critters 8.9alpha" 74 animations thumbnail images.
+	- Fixed getting player's sex scene info(current stage etc.) on the animation detail menu.
+
+v1.0 released 2015.9.20

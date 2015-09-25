@@ -11,6 +11,7 @@ EndEvent
 
 event OnGameReload()
 	parent.OnGameReload()
+	Director.InitialSetup()
 	Director.Setup()
 endEvent
 
