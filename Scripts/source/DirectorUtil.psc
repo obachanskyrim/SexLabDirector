@@ -15,7 +15,6 @@ endFunction
 
 SSLDirector_Controller function GetAPI() global
 	Quest DirectorMainQuest = Game.GetFormFromFile(0xD62, "SexLabDirector.esp") as Quest
-	SSLDirector_Controller Director
 	If DirectorMainQuest
 		return DirectorMainQuest as SSLDirector_Controller
 	else
